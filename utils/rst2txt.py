@@ -1,7 +1,4 @@
-import json
-import os
-import time
-import csv
+import json, time, os
 
 def rst2txt(input:list, genre:str='results'):
 	cwd = os.getcwd()
@@ -12,7 +9,7 @@ def rst2txt(input:list, genre:str='results'):
 	try:
 		with open(file_path, 'w', encoding='utf-8') as f:
 			for element in input:
-				f.write(json.dumps(element).encode().decode('unicode_escape'))
+				f.write(json.dumps(element, ensure_ascii=False))
 				f.write('\n')
 		print("Succeesfully write {} into the text file.".format(genre))
 	except Exception as e:

@@ -4,7 +4,7 @@ from urllib import parse
 import requests
 import re
 
-MAX_DEPTH = 1 # 深度为3
+MAX_DEPTH = 2 # 深度为3
 
 #%%
 def urlMatcher(href_tuple:(str, int)) -> str:

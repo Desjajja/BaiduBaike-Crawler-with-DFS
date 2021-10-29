@@ -3,6 +3,7 @@
 #-------------------------------------------------------------------------------------------------#
 from utils.parser import *
 from utils.rst2txt import rst2txt
+from utils.rst2csv import rst2csv
 
 def main():
 	results = [] # list of dicts that holds the data
@@ -37,7 +38,7 @@ def main():
 			print("Attempt failed: {}".format(url))
 			failures.append(url)
 			continue
-	rst2txt(results)
+	rst2csv(results)
 	rst2txt(failures, genre='failures')
 
 if __name__ == "__main__":
