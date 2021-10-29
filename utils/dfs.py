@@ -3,8 +3,7 @@ from bs4 import BeautifulSoup
 from urllib import parse
 import requests
 import re
-
-MAX_DEPTH = 2 # 深度为3
+from cfg import *
 
 #%%
 def urlMatcher(href_tuple:(str, int)) -> str:
@@ -33,7 +32,7 @@ def soupBoiler(url:str):
 
 #%%
 class DFSNode():
-	def __init__(self, url, soup, dist:int):
+	def __init__(self, url, soup, dist:int=MAX_DEPTH):
 		# url: full url to parse
 		# dist: distance from root node
 		self.distance = dist
@@ -48,3 +47,37 @@ class DFSNode():
 		for tag in set(self.soup.find('div',attrs={"class": "lemma-summary"}).find_all('a', href=True)):
 			self.hrefs.append(tag['href'])
 
+#%%
+def dfs(seed, depth=MAX_DEPTH) -> tuple:
+	results = [] # list of dicts that holds the data
+	failures = [] # holds failed urls
+	count = 0
+
+	
+	stack= [(seed,0)] # original url
+
+	while len(stack) > 0:
+		href_tuple = stack.pop(-1) # (url, dist)
+		url, dist = href_tuple
+
+		url = urlMatcher(href_tuple)
+		soup = soupBoiler(url)
+		try:
+			node = DFSNode(url, soup, dist)
+			node.getHref()
+			result = dict(zip(['词条名称','网址', '描述', '关键字'],[node.title, node.url, node.abstract, node.keyword]))
+			# results.append((result, node.distance))
+			count = count + 1
+			if count % 10 == 0:
+				print("{} items have been added!".format(count))
+			results.append(result)
+			if (node.distance < MAX_DEPTH): # if current depth hasn't reach the limit, push its child into the stack
+				child_distance = node.distance + 1
+				for href in node.hrefs:
+					stack.append((href, child_distance))
+
+		except:
+			print("Attempt failed: {}".format(url))
+			failures.append(url)
+			continue
+	return (results, failures)
